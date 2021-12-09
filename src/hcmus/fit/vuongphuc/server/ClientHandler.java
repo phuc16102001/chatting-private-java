@@ -10,6 +10,8 @@ package hcmus.fit.vuongphuc.server;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTextArea;
 
@@ -47,7 +49,7 @@ public class ClientHandler implements Runnable {
 		txtLog.append(String.format("Talking to client: [%s]\n",socket.getPort()));
 	}
 	
-	private void sendClient(String tag, String[] listMessage) {
+	private void sendClient(String tag, List<String> listMessage) {
 		String sendMessage = tag;
 		for (String message:listMessage) {
 			sendMessage += DELIMITER + message;
@@ -64,7 +66,9 @@ public class ClientHandler implements Runnable {
 	}
 	
 	private void sendClient(String tag, String message) {
-		this.sendClient(tag, new String[] {message});
+		List<String> messages = new ArrayList<>();
+		messages.add(message);
+		this.sendClient(tag, messages);
 	}
 	
 	private void login(String username, String password) {
@@ -98,8 +102,7 @@ public class ClientHandler implements Runnable {
 	
 	private void getOnline() { 
 		String tag = "online";
-		String[] listUser = (String[]) context.getOnline().toArray();
-		sendClient(tag, listUser);
+		sendClient(tag, context.getOnline());
 	}
 	
 	private void processArg(String[] args) {

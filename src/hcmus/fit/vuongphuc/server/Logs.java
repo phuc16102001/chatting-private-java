@@ -10,10 +10,9 @@ package hcmus.fit.vuongphuc.server;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -69,8 +68,11 @@ public class Logs extends JFrame {
 		}
 	}
 	
-	public Set<String> getOnline() {
-		return loginList.keySet();
+	public List<String> getOnline() {
+		Set<String> userList = loginList.keySet();
+		List<String> result = new ArrayList<>();
+		result.addAll(userList);
+		return result;
 	}
 	
 	public JTextArea getTxtLog() {
@@ -91,7 +93,7 @@ public class Logs extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		this.setTitle("Server logs");
-		this.add(createLogPanel(),BorderLayout.CENTER);
+		this.add(createLogPanel(), BorderLayout.CENTER);
 		this.pack();
 		this.setVisible(true);
 		
