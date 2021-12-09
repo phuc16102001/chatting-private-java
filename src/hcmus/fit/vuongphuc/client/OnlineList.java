@@ -14,6 +14,10 @@ package hcmus.fit.vuongphuc.client;
  * @author VuongPhuc
  * @see 
  */
-public class ChatList {
+public class OnlineList {
 
+	public OnlineList() {
+		
+	}
+	
 }

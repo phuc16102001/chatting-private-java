@@ -8,12 +8,17 @@
  */
 package hcmus.fit.vuongphuc.client;
 
+import javax.swing.JFrame;
+
 /**
  * Description:
  *
  * @author VuongPhuc
  * @see 
  */
-public class Inbox {
+public class Inbox extends JFrame {
 
+	public Inbox() {
+		
+	}
 }

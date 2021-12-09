@@ -142,7 +142,7 @@ public class ClientHandler implements Runnable {
 					context.logout(username);
 					break;
 				} else {
-					String[] args = received.split(DELIMITER);
+					String[] args = received.split(DELIMITER,-1);
 					this.processArg(args);
 				}
 			} while (true);
