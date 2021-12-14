@@ -15,15 +15,15 @@ import java.util.List;
 
 import javax.swing.JTextArea;
 
+import hcmus.fit.vuongphuc.constant.Tag;
+
 /**
  * Description:
  *
  * @author VuongPhuc
  * @see 
  */
-public class ClientHandler implements Runnable {
-
-	private final String DELIMITER = "-";
+public class ClientSocket implements Runnable {
 	
 	Logs context = null;
 	JTextArea txtLog = null;
@@ -39,7 +39,7 @@ public class ClientHandler implements Runnable {
 		return this.username;
 	}
 	
-	public ClientHandler(Logs context, Socket socket) throws IOException {
+	public ClientSocket(Logs context, Socket socket) throws IOException {
 		this.context = context;
 		this.txtLog = context.getTxtLog();
 		this.socket = socket;
@@ -52,7 +52,7 @@ public class ClientHandler implements Runnable {
 	private void sendClient(String tag, List<String> listMessage) {
 		String sendMessage = tag;
 		for (String message:listMessage) {
-			sendMessage += DELIMITER + message;
+			sendMessage += Tag.DELIMITER + message;
 		}
 		try {
 			writer.write(sendMessage);
@@ -105,7 +105,7 @@ public class ClientHandler implements Runnable {
 		sendClient(tag, context.getOnline());
 	}
 	
-	private void processArg(String[] args) {
+	private boolean processArg(String[] args) {
 		String route = args[0];
 		if (route.equalsIgnoreCase("login")) {
 			String username = args[1];
@@ -126,6 +126,10 @@ public class ClientHandler implements Runnable {
 		else if (route.equalsIgnoreCase("send")) {
 			
 		}
+		else if (route.equalsIgnoreCase("logout")) {
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -134,16 +138,15 @@ public class ClientHandler implements Runnable {
 			do {
 				String received = reader.readLine();
 				txtLog.append(String.format("Receive [%s]-[%s]\n",socket.getPort(),received));					
-				
-				if (received.equalsIgnoreCase("quit")) {
+		
+				String[] args = received.split(Tag.DELIMITER,-1);
+				boolean stop = this.processArg(args);
+				if (stop) {
 					reader.close();
 					writer.close();
 					socket.close();
 					context.logout(username);
 					break;
-				} else {
-					String[] args = received.split(DELIMITER,-1);
-					this.processArg(args);
 				}
 			} while (true);
 		} catch (Exception e) {

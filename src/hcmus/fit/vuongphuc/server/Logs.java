@@ -25,7 +25,7 @@ public class Logs extends JFrame {
 
 	JTextArea txtLog = new JTextArea(10,50);
 	ServerSocket socket = null;
-	HashMap<String, ClientHandler> loginList = new HashMap<>();
+	HashMap<String, ClientSocket> loginList = new HashMap<>();
 	
 	private class CreateSocketListener implements Runnable {
 		
@@ -44,7 +44,7 @@ public class Logs extends JFrame {
 					txtLog.append("Listen on port 3200...\n");
 					Socket clientSocket = socket.accept();
 					
-					Thread t = new Thread(new ClientHandler(context, clientSocket));
+					Thread t = new Thread(new ClientSocket(context, clientSocket));
 					t.start();
 				} while (true);
 			} catch (IOException e) {
@@ -58,13 +58,14 @@ public class Logs extends JFrame {
 		}
 	}
 	
-	public void login(String username, ClientHandler client) {
+	public void login(String username, ClientSocket client) {
 		loginList.put(username, client);
 	}
 	
 	public void logout(String username) {
 		if (username!=null) {			
 			loginList.remove(username);
+			txtLog.append(String.format("User [%s] logout\n",username));
 		}
 	}
 	

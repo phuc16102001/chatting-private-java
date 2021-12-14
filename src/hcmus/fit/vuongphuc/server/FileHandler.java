@@ -10,6 +10,8 @@ package hcmus.fit.vuongphuc.server;
 
 import java.io.*;
 
+import hcmus.fit.vuongphuc.constant.Tag;
+
 /**
  * Description:
  *
@@ -19,7 +21,6 @@ import java.io.*;
 public class FileHandler {
 
 	private static final String ACCOUNT_PATH = "account.dat";
-	private static final String DELIMITER = "-";
 	
 	public static Boolean login(String username, String password) throws IOException {
 		BufferedReader reader = null;
@@ -32,7 +33,7 @@ public class FileHandler {
 		String line = null;
 		while ((line=reader.readLine())!=null) {
 			line = line.replace("\n", "");
-			String[] args = line.split(DELIMITER);
+			String[] args = line.split(Tag.DELIMITER);
 			if (args[0].equals(username) && args[1].equals(password)) {
 				reader.close();
 				return true;
@@ -49,7 +50,7 @@ public class FileHandler {
 		
 			String line = null;
 			while ((line=reader.readLine())!=null) {
-				String[] args = line.split(DELIMITER);
+				String[] args = line.split(Tag.DELIMITER);
 				if (username.equalsIgnoreCase(args[0])) {
 					reader.close();
 					return false;
@@ -62,7 +63,7 @@ public class FileHandler {
 		}
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ACCOUNT_PATH,true));
-		writer.write(username+DELIMITER+password+"\n");
+		writer.write(username+Tag.DELIMITER+password+"\n");
 		writer.close();
 		return true;
 	}

@@ -15,6 +15,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import hcmus.fit.vuongphuc.constant.Tag;
+
 /**
  * Description:
  *
@@ -27,9 +29,22 @@ public class SocketHandler {
 	private BufferedWriter writer = null;
 	
 	private static SocketHandler instance = null;
-	public static String DELIMITER = "-";
 	
 	private SocketHandler() {}
+	
+	public String send(String message, boolean hasResponse) throws IOException {
+		String response = null;
+		
+		writer.write(message);
+		writer.newLine();
+		writer.flush();
+		
+		if (hasResponse==true) {
+			response = reader.readLine();
+		} 
+		
+		return response;
+	}
 	
 	
 	public String send(String tag, String[] messages, boolean hasResponse) throws IOException{
@@ -37,15 +52,10 @@ public class SocketHandler {
 
 		String sendMessage = tag;
 		for (String message:messages) {
-			sendMessage += DELIMITER+message;
+			sendMessage += Tag.DELIMITER+message;
 		}
-		writer.write(sendMessage);
-		writer.newLine();
-		writer.flush();
 		
-		if (hasResponse==true) {
-			response = reader.readLine();
-		} 
+		response = send(sendMessage, hasResponse);
 		
 		return response;
 	}

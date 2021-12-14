@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.Socket;
 import javax.swing.border.*;
 
+import hcmus.fit.vuongphuc.constant.Tag;
 import hcmus.fit.vuongphuc.ui.MyDialog;
 
 /**
@@ -39,9 +40,10 @@ public class LoginSignup extends JFrame implements ActionListener {
 		if (src==btnLogin) {
 			try {
 				String response = SocketHandler.getInstance().send("login", new String[] {username, password}, true);
-				String[] args = response.split(SocketHandler.DELIMITER);
+				String[] args = response.split(Tag.DELIMITER);
 				
 				if (args[0].equalsIgnoreCase("login") && args[1].equalsIgnoreCase("success")) {					
+					UserInformation.getInstance().setUsername(username);
 					new OnlineList();
 					this.dispose();
 				} else {
@@ -56,6 +58,23 @@ public class LoginSignup extends JFrame implements ActionListener {
 			}
 		} 
 		else if (src==btnSignup) {
+			try {
+				String response = SocketHandler.getInstance().send("signup", new String[] {username, password}, true);
+				String[] args = response.split(Tag.DELIMITER);
+				
+				if (args[0].equalsIgnoreCase("signup") && args[1].equalsIgnoreCase("success")) {					
+					JDialog dialog = new MyDialog(this,"Error","Signup successfully");
+					dialog.setVisible(true);
+				} else {
+					JDialog dialog = new MyDialog(this,"Error","Signup fail");
+					dialog.setVisible(true);
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+
+				JDialog dialog = new MyDialog(this,"Error","Cannot connect to server");
+				dialog.setVisible(true);
+			}
 		}
 	}
 	
