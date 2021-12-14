@@ -12,8 +12,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import hcmus.fit.vuongphuc.constant.Tag;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -30,6 +33,7 @@ public class ChatBox extends JFrame implements ActionListener {
 	private JTextArea txtChatBox = new JTextArea(10,10);
 	private JTextField txtInput = new JTextField(20);
 	private JButton btnSend = new JButton("Send");
+	private JButton btnFile = new JButton(UIManager.getIcon("FileView.fileIcon"));
 	
 	public void addMessage(String username, String message) {
 		txtChatBox.append(String.format("%s: %s\n",	username,message));
@@ -42,10 +46,19 @@ public class ChatBox extends JFrame implements ActionListener {
 			String message = txtInput.getText();
 			txtInput.setText(null);
 			try {
-				SocketHandler.getInstance().send("send", targetName, message);
+				SocketHandler.getInstance().send(Tag.SEND_TEXT, targetName, message);
 				addMessage(UserInformation.getInstance().getUsername(), message);
 			} catch (IOException e1) {
 				e1.printStackTrace();
+			}
+		} 
+		else if (src==btnFile) {
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Select file");
+			int returnValue = fileChooser.showOpenDialog(this);
+			if (returnValue==JFileChooser.APPROVE_OPTION) {
+				File selectedFile = fileChooser.getSelectedFile();
+				System.out.println("Opened file "+selectedFile.getAbsolutePath());
 			}
 		}
 	}
@@ -64,9 +77,11 @@ public class ChatBox extends JFrame implements ActionListener {
 		JPanel panel = new JPanel();
 		
 		btnSend.addActionListener(this);
+		btnFile.addActionListener(this);
 		
 		panel.add(txtInput);
 		panel.add(btnSend);
+		panel.add(btnFile);
 		
 		return panel;
 	}

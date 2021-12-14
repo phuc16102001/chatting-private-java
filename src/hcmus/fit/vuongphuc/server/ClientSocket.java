@@ -80,65 +80,70 @@ public class ClientSocket implements Runnable {
 	}
 	
 	private void login(String username, String password) {
-		String tag = "login";
+		String tag = Tag.LOGIN;
 		try {
 			if (FileHandler.login(username,password)) {
-				sendClient(tag,"success");
+				sendClient(tag,Tag.SUCCESS);
 				this.username = username;
 				this.context.login(username, this);
 			} else {
-				sendClient(tag,"fail");
+				sendClient(tag,Tag.FAIL);
 			}
 		} catch (IOException e) {
-			sendClient(tag,"fail");
+			sendClient(tag,Tag.FAIL);
 			e.printStackTrace();
 		}
 	}
 	
 	private void signup(String username, String password) {
-		String tag = "signup";
+		String tag = Tag.SIGNUP;
 		try {
 			if (FileHandler.signup(username,password)) {
-				sendClient(tag,"success");
+				sendClient(tag,Tag.SUCCESS);
 			} else {
-				sendClient(tag,"fail");
+				sendClient(tag,Tag.FAIL);
 			}
 		} catch (IOException e) {
-			sendClient(tag,"fail");
+			sendClient(tag,Tag.FAIL);
 			e.printStackTrace();
 		}
 	}
 	
 	private void getOnline() { 
-		String tag = "online";
+		String tag = Tag.LIST_ONLINE;
 		sendClient(tag, context.getOnline());
 	}
 	
 	private boolean processArg(String[] args) {
 		String route = args[0];
-		if (route.equalsIgnoreCase("login")) {
+		if (route.equalsIgnoreCase(Tag.LOGIN)) {
 			String username = args[1];
 			String password = args[2];
 			login(username,password);
 		}
-		else if (route.equalsIgnoreCase("signup")) {
+		else if (route.equalsIgnoreCase(Tag.SIGNUP)) {
 			String username = args[1];
 			String password = args[2];		
 			signup(username,password);
 		}
-		else if (route.equalsIgnoreCase("online")) {
+		else if (route.equalsIgnoreCase(Tag.LIST_ONLINE)) {
 			getOnline();
 		}
-		else if (route.equalsIgnoreCase("send")) {
+		else if (route.equalsIgnoreCase(Tag.SEND_TEXT)) {
 			String username = args[1];
 			String message = args[2];
-			context.loginList.get(username).sendClient("send", this.username, message);
+			context.loginList.get(username).sendClient(Tag.SEND_TEXT, this.username, message);
 		}
-		else if (route.equalsIgnoreCase("logout")) {
+		else if (route.equalsIgnoreCase(Tag.LOGOUT)) {
 			context.logout(username);
 		}
-		else if (route.equalsIgnoreCase("quit")) {
+		else if (route.equalsIgnoreCase(Tag.QUIT)) {
 			return true;
+		} 
+		else if (route.equalsIgnoreCase(Tag.SEND_FILE)) {
+			String username = args[1];
+			int length = Integer.valueOf(args[2]);
+			
 		}
 		return false;
 	}

@@ -39,10 +39,10 @@ public class LoginSignup extends JFrame implements ActionListener {
 
 		if (src==btnLogin) {
 			try {
-				String response = SocketHandler.getInstance().send("login", new String[] {username, password}, true);
+				String response = SocketHandler.getInstance().send(Tag.LOGIN, new String[] {username, password}, true);
 				String[] args = response.split(Tag.DELIMITER);
 				
-				if (args[0].equalsIgnoreCase("login") && args[1].equalsIgnoreCase("success")) {					
+				if (args[0].equalsIgnoreCase(Tag.LOGIN) && args[1].equalsIgnoreCase(Tag.SUCCESS)) {					
 					UserInformation.getInstance().setUsername(username);
 					new OnlineList();
 					this.dispose();
@@ -59,10 +59,10 @@ public class LoginSignup extends JFrame implements ActionListener {
 		} 
 		else if (src==btnSignup) {
 			try {
-				String response = SocketHandler.getInstance().send("signup", new String[] {username, password}, true);
+				String response = SocketHandler.getInstance().send(Tag.SIGNUP, new String[] {username, password}, true);
 				String[] args = response.split(Tag.DELIMITER);
 				
-				if (args[0].equalsIgnoreCase("signup") && args[1].equalsIgnoreCase("success")) {					
+				if (args[0].equalsIgnoreCase(Tag.SIGNUP) && args[1].equalsIgnoreCase(Tag.SUCCESS)) {					
 					JDialog dialog = new MyDialog(this,"Error","Signup successfully");
 					dialog.setVisible(true);
 				} else {

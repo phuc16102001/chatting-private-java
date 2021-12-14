@@ -11,6 +11,8 @@ package hcmus.fit.vuongphuc.client;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.swing.DefaultListModel;
+
 import hcmus.fit.vuongphuc.constant.Tag;
 
 /**
@@ -33,7 +35,7 @@ public class ListenMessage implements Runnable {
 			do {
 				String response = SocketHandler.getInstance().readLine();
 				String[] args = response.split(Tag.DELIMITER);
-				if (args[0].equalsIgnoreCase("send")) {
+				if (args[0].equalsIgnoreCase(Tag.SEND_TEXT)) {
 					String username = args[1];
 					String message = args[2];
 					HashMap<String, ChatBox> lsChatBox = context.getListChatBox();
@@ -43,6 +45,18 @@ public class ListenMessage implements Runnable {
 						lsChatBox.put(username, chatBox);
 					}
 					chatBox.addMessage(username,message);
+				} 
+				else if (args[0].equalsIgnoreCase(Tag.LIST_ONLINE)) {
+					DefaultListModel<String> model = context.getModel();
+					model.clear();
+					for (int i=1;i<args.length;i++) {
+						if (!(args[i].equalsIgnoreCase(UserInformation.getInstance().getUsername()))) {							
+							model.addElement(args[i]);
+						}
+					}
+					synchronized (context.getListOnline()) {
+						context.getListOnline().notify();
+					}
 				}
 			} while (true);
 		} catch (IOException e) {

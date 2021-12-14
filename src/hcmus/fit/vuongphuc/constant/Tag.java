@@ -16,4 +16,13 @@ package hcmus.fit.vuongphuc.constant;
  */
 public class Tag {
 	public static String DELIMITER = "-";
+	public static String SIGNUP = "signup";
+	public static String LOGIN = "login";
+	public static String SEND_TEXT = "send";
+	public static String SEND_FILE = "file";
+	public static String LOGOUT = "logout";
+	public static String QUIT = "quit";
+	public static String LIST_ONLINE = "online";
+	public static String SUCCESS = "success";
+	public static String FAIL = "fail";
 }

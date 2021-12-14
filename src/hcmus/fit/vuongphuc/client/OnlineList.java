@@ -11,6 +11,7 @@ package hcmus.fit.vuongphuc.client;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import hcmus.fit.vuongphuc.constant.Tag;
 import hcmus.fit.vuongphuc.server.ClientSocket;
 import hcmus.fit.vuongphuc.ui.MyDialog;
 
@@ -32,6 +33,8 @@ public class OnlineList extends JFrame implements ActionListener {
 	private JList<String> lsOnline = new JList<String>(model);
 	private HashMap<String, ChatBox> lsChatBox = new HashMap<>();
 	
+	private Thread threadListen = null;
+	
 	private JButton btnLogout = new JButton("Logout");
 	private JButton btnRefresh = new JButton("Refresh");
 
@@ -46,13 +49,16 @@ public class OnlineList extends JFrame implements ActionListener {
 				for (String username:lsChatBox.keySet()) {
 					lsChatBox.get(username).dispose();
 				}
-				SocketHandler.getInstance().send("logout",false);
+				SocketHandler.getInstance().send(Tag.LOGOUT,false);
 				UserInformation.getInstance().setUsername(null);
+				threadListen.interrupt();
+				
 				new LoginSignup();
 				this.dispose();
 			} catch (IOException e1) {
-				MyDialog dialog = new MyDialog(this,"Error","Cannot connect to server");
+				MyDialog dialog = new MyDialog(null,"Error","Cannot connect to server");
 				dialog.setVisible(true);
+				this.dispose();
 				e1.printStackTrace();
 			}
 		}
@@ -121,8 +127,11 @@ public class OnlineList extends JFrame implements ActionListener {
 	}
 	
 	private void refreshListOnline() {
-		Thread t = new Thread(new LoadOnline(this));
-		t.start();
+		try {
+			SocketHandler.getInstance().send(Tag.LIST_ONLINE, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public DefaultListModel getModel() {
@@ -146,8 +155,8 @@ public class OnlineList extends JFrame implements ActionListener {
 
 		refreshListOnline();
 		
-		Thread t = new Thread(new ListenMessage(this));
-		t.start();
+		threadListen = new Thread(new ListenMessage(this));
+		threadListen.start();
 		
 	}
 	
