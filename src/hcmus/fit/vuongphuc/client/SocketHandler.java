@@ -33,6 +33,10 @@ public class SocketHandler {
 	
 	private SocketHandler() {}
 	
+	public Socket getSocket() {
+		return socket;
+	}
+	
 	public String readLine() throws IOException {
 		return reader.readLine();
 	}

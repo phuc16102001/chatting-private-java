@@ -1,5 +1,5 @@
 /**
- * @package hcmus.fit.vuongphuc.client
+w * @package hcmus.fit.vuongphuc.client
  * @author VuongPhuc
  *
  * Dec. 10, 2021 - 2:30:58 a.m.

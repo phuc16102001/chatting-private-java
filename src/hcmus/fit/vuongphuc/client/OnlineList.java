@@ -134,7 +134,7 @@ public class OnlineList extends JFrame implements ActionListener {
 		}
 	}
 	
-	public DefaultListModel getModel() {
+	public DefaultListModel<String> getModel() {
 		return model;
 	}
 	

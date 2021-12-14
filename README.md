@@ -19,6 +19,6 @@ RES: None
 REQ: quit
 RES: None
 
-REQ: file-<toUser>-<length>
-RES: file-<status> (accept/deny)
+REQ: fileInfo-<toUser>-<length>
+RES: fileRes-<status>-<length> (accept/deny)
 REQ: <bits>

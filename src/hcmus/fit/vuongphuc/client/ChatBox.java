@@ -35,8 +35,14 @@ public class ChatBox extends JFrame implements ActionListener {
 	private JButton btnSend = new JButton("Send");
 	private JButton btnFile = new JButton(UIManager.getIcon("FileView.fileIcon"));
 	
+	private File selectedFile = null;
+	
 	public void addMessage(String username, String message) {
 		txtChatBox.append(String.format("%s: %s\n",	username,message));
+	}
+	
+	public File getSelectedFile() {
+		return selectedFile;
 	}
 	
 	@Override
@@ -57,8 +63,12 @@ public class ChatBox extends JFrame implements ActionListener {
 			fileChooser.setDialogTitle("Select file");
 			int returnValue = fileChooser.showOpenDialog(this);
 			if (returnValue==JFileChooser.APPROVE_OPTION) {
-				File selectedFile = fileChooser.getSelectedFile();
-				System.out.println("Opened file "+selectedFile.getAbsolutePath());
+				selectedFile = fileChooser.getSelectedFile();
+				try {
+					SocketHandler.getInstance().send(Tag.FILE_INFO, UserInformation.getInstance().getUsername(),String.valueOf(selectedFile.getTotalSpace()));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}

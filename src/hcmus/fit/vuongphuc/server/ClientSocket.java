@@ -39,6 +39,10 @@ public class ClientSocket implements Runnable {
 		return this.username;
 	}
 	
+	public Socket getSocket() {
+		return socket;
+	}
+	
 	public ClientSocket(Logs context, Socket socket) throws IOException {
 		this.context = context;
 		this.txtLog = context.getTxtLog();
@@ -114,7 +118,7 @@ public class ClientSocket implements Runnable {
 		sendClient(tag, context.getOnline());
 	}
 	
-	private boolean processArg(String[] args) {
+	private boolean processArg(String[] args) throws IOException {
 		String route = args[0];
 		if (route.equalsIgnoreCase(Tag.LOGIN)) {
 			String username = args[1];
@@ -140,10 +144,32 @@ public class ClientSocket implements Runnable {
 		else if (route.equalsIgnoreCase(Tag.QUIT)) {
 			return true;
 		} 
-		else if (route.equalsIgnoreCase(Tag.SEND_FILE)) {
+		else if (route.equalsIgnoreCase(Tag.FILE_INFO)) {
 			String username = args[1];
-			int length = Integer.valueOf(args[2]);
+			String length = args[2];
+			context.loginList.get(username).sendClient(Tag.FILE_INFO, this.username, length);
+		}
+		else if (route.equalsIgnoreCase(Tag.FILE_RES)) {
+			String username = args[1];
+			String response = args[2];
+			Long length = Long.valueOf(args[3]);
+			sendClient(Tag.FILE_RES, username, response, length.toString());
 			
+			if (response.equalsIgnoreCase(Tag.ACCEPT)) {
+				DataInputStream dis = new DataInputStream(socket.getInputStream());
+				DataOutputStream dos = new DataOutputStream(context.loginList.get(username).getSocket().getOutputStream());
+			
+				int read = 0;
+				long remain = length;
+				byte[] buffer = new byte[4096];
+				while ((read=dis.read(buffer,0,(int) Math.min(buffer.length,remain)))>0) {
+					remain -= read;
+					dos.write(buffer,0,read);
+				}
+				
+				dis.close();
+				dos.close();
+			}
 		}
 		return false;
 	}
