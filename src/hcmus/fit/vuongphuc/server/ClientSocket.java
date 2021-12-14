@@ -135,6 +135,9 @@ public class ClientSocket implements Runnable {
 			context.loginList.get(username).sendClient("send", this.username, message);
 		}
 		else if (route.equalsIgnoreCase("logout")) {
+			context.logout(username);
+		}
+		else if (route.equalsIgnoreCase("quit")) {
 			return true;
 		}
 		return false;
@@ -150,16 +153,20 @@ public class ClientSocket implements Runnable {
 				String[] args = received.split(Tag.DELIMITER,-1);
 				boolean stop = this.processArg(args);
 				if (stop) {
-					reader.close();
-					writer.close();
-					socket.close();
-					context.logout(username);
 					break;
 				}
 			} while (true);
 		} catch (Exception e) {
-			context.logout(username);
 			e.printStackTrace();
+		} finally {
+			try {
+				context.logout(username);
+				reader.close();
+				writer.close();
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

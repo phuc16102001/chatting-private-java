@@ -27,10 +27,15 @@ public class SocketHandler {
 	private Socket socket = null;
 	private BufferedReader reader = null;
 	private BufferedWriter writer = null;
+	private Thread listenThread;
 	
 	private static SocketHandler instance = null;
 	
 	private SocketHandler() {}
+	
+	public String readLine() throws IOException {
+		return reader.readLine();
+	}
 	
 	public String send(String message, boolean hasResponse) throws IOException {
 		String response = null;
@@ -46,7 +51,6 @@ public class SocketHandler {
 		return response;
 	}
 	
-	
 	public String send(String tag, String[] messages, boolean hasResponse) throws IOException{
 		String response = null;
 
@@ -60,7 +64,7 @@ public class SocketHandler {
 		return response;
 	}
 
-	public void send(String tag, String[] messages) throws IOException {
+	public void send(String tag, String...messages) throws IOException {
 		this.send(tag, messages, false);
 	}
 	
@@ -81,10 +85,16 @@ public class SocketHandler {
 		return instance;
 	}
 	
+	public void close() throws IOException {
+		writer.close();
+		reader.close();
+		socket.close();
+	}
+	
 	public void setSocket(Socket socket) throws IOException {
 		this.socket = socket;
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-		this.socket.setSoTimeout(5000);
+//		this.socket.setSoTimeout(5000);
 	}
 }

@@ -16,6 +16,8 @@ import hcmus.fit.vuongphuc.ui.MyDialog;
 
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.*;
+import java.util.List;
 import java.awt.*;
 
 /**
@@ -28,6 +30,7 @@ public class OnlineList extends JFrame implements ActionListener {
 
 	private DefaultListModel<String> model = new DefaultListModel<String>();
 	private JList<String> lsOnline = new JList<String>(model);
+	private HashMap<String, ChatBox> lsChatBox = new HashMap<>();
 	
 	private JButton btnLogout = new JButton("Logout");
 	private JButton btnRefresh = new JButton("Refresh");
@@ -40,6 +43,9 @@ public class OnlineList extends JFrame implements ActionListener {
 		} 
 		else if (src==btnLogout) {
 			try {
+				for (String username:lsChatBox.keySet()) {
+					lsChatBox.get(username).dispose();
+				}
 				SocketHandler.getInstance().send("logout",false);
 				UserInformation.getInstance().setUsername(null);
 				new LoginSignup();
@@ -50,6 +56,10 @@ public class OnlineList extends JFrame implements ActionListener {
 				e1.printStackTrace();
 			}
 		}
+	}
+	
+	public HashMap<String, ChatBox> getListChatBox() {
+		return lsChatBox;
 	}
 	
 	public void clearList() {
@@ -84,7 +94,7 @@ public class OnlineList extends JFrame implements ActionListener {
 					int index = list.locationToIndex(e.getPoint());
 					if (index!=-1) {
 						String username = lsOnline.getSelectedValue();
-						new ChatBox(username);
+						lsChatBox.put(username, new ChatBox(UserInformation.getInstance().getUsername(),username));
 					}
 				}
 			}
@@ -133,7 +143,12 @@ public class OnlineList extends JFrame implements ActionListener {
 		this.add(createBottom(),BorderLayout.SOUTH);
 		this.pack();
 		this.setVisible(true);
+
 		refreshListOnline();
+		
+		Thread t = new Thread(new ListenMessage(this));
+		t.start();
+		
 	}
 	
 }

@@ -14,6 +14,7 @@ import javax.swing.border.TitledBorder;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 /**
  * Description:
@@ -24,16 +25,28 @@ import java.awt.event.*;
 public class ChatBox extends JFrame implements ActionListener {
 
 	private String username;
+	private String targetName;
 	
 	private JTextArea txtChatBox = new JTextArea(10,10);
 	private JTextField txtInput = new JTextField(20);
 	private JButton btnSend = new JButton("Send");
+	
+	public void addMessage(String username, String message) {
+		txtChatBox.append(String.format("%s: %s\n",	username,message));
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if (src==btnSend) {
 			String message = txtInput.getText();
+			txtInput.setText(null);
+			try {
+				SocketHandler.getInstance().send("send", targetName, message);
+				addMessage(UserInformation.getInstance().getUsername(), message);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	
@@ -58,11 +71,12 @@ public class ChatBox extends JFrame implements ActionListener {
 		return panel;
 	}
 	
-	public ChatBox(String username) {
+	public ChatBox(String username, String targetName) {
 		this.username = username;
+		this.targetName = targetName;
 		
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		this.setTitle(String.format("Chat box (%s)", this.username));
+		this.setTitle(String.format("Chat box (%s-%s)", this.username, this.targetName));
 		
 		this.add(createCenter(),BorderLayout.CENTER);
 		this.add(createBottom(),BorderLayout.SOUTH);

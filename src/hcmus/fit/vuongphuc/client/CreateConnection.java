@@ -8,16 +8,12 @@
  */
 package hcmus.fit.vuongphuc.client;
 
-import java.awt.Frame;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.border.EmptyBorder;
 
 import hcmus.fit.vuongphuc.ui.MyDialog;
 
@@ -50,6 +46,7 @@ public class CreateConnection implements Runnable {
 			socket.connect(sockAddress,5000);
 			
 			SocketHandler.getInstance().setSocket(socket);
+			
 			new LoginSignup();
 			dialog.dispose();
 			context.dispose();
