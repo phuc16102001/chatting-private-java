@@ -65,6 +65,14 @@ public class ClientSocket implements Runnable {
 		}
 	}
 	
+	private void sendClient(String tag, String...strings) {
+		List<String> listMessage = new ArrayList<String>();
+		for (String s:strings) {
+			listMessage.add(s);
+		}
+		sendClient(tag, listMessage);
+	}
+	
 	private void sendClient(String tag, String message) {
 		List<String> messages = new ArrayList<>();
 		messages.add(message);
@@ -121,11 +129,10 @@ public class ClientSocket implements Runnable {
 		else if (route.equalsIgnoreCase("online")) {
 			getOnline();
 		}
-		else if (route.equalsIgnoreCase("begin")) {
-			
-		} 
 		else if (route.equalsIgnoreCase("send")) {
-			
+			String username = args[1];
+			String message = args[2];
+			context.loginList.get(username).sendClient("send", this.username, message);
 		}
 		else if (route.equalsIgnoreCase("logout")) {
 			return true;

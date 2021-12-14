@@ -82,7 +82,10 @@ public class OnlineList extends JFrame implements ActionListener {
 				JList list = (JList) e.getSource();
 				if (e.getClickCount()==2) {
 					int index = list.locationToIndex(e.getPoint());
-					System.out.println("Clicked at: "+index);
+					if (index!=-1) {
+						String username = lsOnline.getSelectedValue();
+						new ChatBox(username);
+					}
 				}
 			}
 		});
@@ -122,6 +125,8 @@ public class OnlineList extends JFrame implements ActionListener {
 	
 	public OnlineList() {
 		JFrame.setDefaultLookAndFeelDecorated(true);
+		
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setTitle("Online list");
 		this.add(createTop(),BorderLayout.NORTH);
 		this.add(createCenter(),BorderLayout.CENTER);
