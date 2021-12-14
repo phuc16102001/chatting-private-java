@@ -76,6 +76,7 @@ public class ClientSocket implements Runnable {
 		try {
 			if (FileHandler.login(username,password)) {
 				sendClient(tag,"success");
+				this.username = username;
 				this.context.login(username, this);
 			} else {
 				sendClient(tag,"fail");

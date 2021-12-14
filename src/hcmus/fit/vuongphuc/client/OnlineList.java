@@ -73,8 +73,21 @@ public class OnlineList extends JFrame implements ActionListener {
 	
 	private JScrollPane createCenter() {
 		JScrollPane panel = new JScrollPane(lsOnline);
+		
 		panel.setBorder(new TitledBorder("Online user"));
+		
+		lsOnline.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JList list = (JList) e.getSource();
+				if (e.getClickCount()==2) {
+					int index = list.locationToIndex(e.getPoint());
+					System.out.println("Clicked at: "+index);
+				}
+			}
+		});
 		lsOnline.setBorder(new EmptyBorder(10,10,10,10));
+		
 		return panel;
 	}
 	
