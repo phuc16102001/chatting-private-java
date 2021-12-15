@@ -8,7 +8,6 @@
  */
 package hcmus.fit.vuongphuc.client;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -106,9 +105,6 @@ public class ListenMessage implements Runnable {
 					System.out.println("Done sending file");
 				}
 				else if (route.equalsIgnoreCase(Tag.SEND_FILE)) {
-
-					String from = args[1];
-					String to = args[2];
 					Long length = Long.parseLong(args[3]);
 					String fileName = args[4];
 					

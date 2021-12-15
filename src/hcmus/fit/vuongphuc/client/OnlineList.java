@@ -12,13 +12,11 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import hcmus.fit.vuongphuc.constant.Tag;
-import hcmus.fit.vuongphuc.server.ClientSocket;
 import hcmus.fit.vuongphuc.ui.MyDialog;
 
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.awt.*;
 
 /**
