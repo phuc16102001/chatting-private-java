@@ -10,6 +10,8 @@ package hcmus.fit.vuongphuc.client;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,31 +27,39 @@ import hcmus.fit.vuongphuc.constant.Tag;
  */
 public class SocketHandler {
 	private Socket socket = null;
-	private BufferedReader reader = null;
-	private BufferedWriter writer = null;
-	private Thread listenThread;
+	private DataInputStream reader = null;
+	private DataOutputStream writer = null;
 	
 	private static SocketHandler instance = null;
 	
 	private SocketHandler() {}
+	
+	public DataInputStream getReader() {
+		return reader;
+	}
+	
+	public DataOutputStream getWriter() {
+		return writer;
+	}
 	
 	public Socket getSocket() {
 		return socket;
 	}
 	
 	public String readLine() throws IOException {
-		return reader.readLine();
+		return reader.readUTF();
 	}
 	
 	public String send(String message, boolean hasResponse) throws IOException {
 		String response = null;
 		
-		writer.write(message);
-		writer.newLine();
+		writer.writeUTF(message);
 		writer.flush();
 		
+		System.out.println(String.format("Write package: [%s,%s]",message,String.valueOf(hasResponse)));
+		
 		if (hasResponse==true) {
-			response = reader.readLine();
+			response = reader.readUTF();
 		} 
 		
 		return response;
@@ -97,8 +107,8 @@ public class SocketHandler {
 	
 	public void setSocket(Socket socket) throws IOException {
 		this.socket = socket;
-		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+		this.reader = new DataInputStream(socket.getInputStream());
+		this.writer = new DataOutputStream(socket.getOutputStream());
 //		this.socket.setSoTimeout(5000);
 	}
 }

@@ -29,8 +29,8 @@ public class ClientSocket implements Runnable {
 	JTextArea txtLog = null;
 	
 	Socket socket = null;
-	BufferedReader reader = null;
-	BufferedWriter writer = null;
+	DataInputStream reader = null;
+	DataOutputStream writer = null;
 	
 	Socket partner = null;
 	String username = null;
@@ -47,8 +47,8 @@ public class ClientSocket implements Runnable {
 		this.context = context;
 		this.txtLog = context.getTxtLog();
 		this.socket = socket;
-		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+		this.reader = new DataInputStream(socket.getInputStream());
+		this.writer = new DataOutputStream(socket.getOutputStream());
 	
 		txtLog.append(String.format("Talking to client: [%s]\n",socket.getPort()));
 	}
@@ -59,8 +59,7 @@ public class ClientSocket implements Runnable {
 			sendMessage += Tag.DELIMITER + message;
 		}
 		try {
-			writer.write(sendMessage);
-			writer.newLine();
+			writer.writeUTF(sendMessage);
 			writer.flush();
 			txtLog.append(String.format("Send [%s]-[%s]\n",socket.getPort(),sendMessage));
 		} catch (IOException e) {
@@ -145,40 +144,51 @@ public class ClientSocket implements Runnable {
 			return true;
 		} 
 		else if (route.equalsIgnoreCase(Tag.FILE_INFO)) {
-			String username = args[1];
-			String length = args[2];
-			context.loginList.get(username).sendClient(Tag.FILE_INFO, this.username, length);
+			String from = args[1];
+			String to = args[2];
+			String length = args[3];
+			String fileName = args[4];
+			context.loginList.get(to).sendClient(Tag.FILE_INFO, from, to, length, fileName);
 		}
 		else if (route.equalsIgnoreCase(Tag.FILE_RES)) {
-			String username = args[1];
-			String response = args[2];
-			Long length = Long.valueOf(args[3]);
-			sendClient(Tag.FILE_RES, username, response, length.toString());
+			String from = args[1];
+			String to = args[2];
+			String response = args[3];
+			String length = args[4];
+			String fileName = args[5];
+			context.loginList.get(to).sendClient(Tag.FILE_RES, from, to, response, length, fileName);
+		}
+		else if (route.equalsIgnoreCase(Tag.SEND_FILE)) {
+			String from = args[1];
+			String to = args[2];
+			Long length = Long.parseLong(args[3]);
+			String fileName = args[4];
 			
-			if (response.equalsIgnoreCase(Tag.ACCEPT)) {
-				DataInputStream dis = new DataInputStream(socket.getInputStream());
-				DataOutputStream dos = new DataOutputStream(context.loginList.get(username).getSocket().getOutputStream());
+			ClientSocket target = context.loginList.get(to);
+			target.sendClient(Tag.SEND_FILE, from, to, length.toString(), fileName);
 			
-				int read = 0;
-				long remain = length;
-				byte[] buffer = new byte[4096];
-				while ((read=dis.read(buffer,0,(int) Math.min(buffer.length,remain)))>0) {
-					remain -= read;
-					dos.write(buffer,0,read);
-				}
-				
-				dis.close();
-				dos.close();
+			int read = 0;
+			long remain = length;
+			byte[] buffer = new byte[4096];
+			
+			txtLog.append(String.format("Start receiving file total size: %d\n",remain));
+			
+			while ((read=reader.readNBytes(buffer,0,(int) Math.min(buffer.length,remain)))>0) {
+				remain -= read;
+				target.writer.write(buffer);
+				txtLog.append(String.format("Data remain: %d\n", remain));
 			}
+			reader.skip(reader.available());
 		}
 		return false;
 	}
 	
-	@Override
+	@Override 
 	public void run() {
 		try {
 			do {
-				String received = reader.readLine();
+				txtLog.append("Wait for message\n");
+				String received = reader.readUTF();
 				txtLog.append(String.format("Receive [%s]-[%s]\n",socket.getPort(),received));					
 		
 				String[] args = received.split(Tag.DELIMITER,-1);

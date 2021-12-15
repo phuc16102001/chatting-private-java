@@ -8,6 +8,7 @@
  */
 package hcmus.fit.vuongphuc.client;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -41,11 +42,9 @@ public class ListenMessage implements Runnable {
 		try {
 			do {
 				String response = SocketHandler.getInstance().readLine();
-				if (response==null) {
-					continue;
-				}
 				String[] args = response.split(Tag.DELIMITER);
-				if (args[0].equalsIgnoreCase(Tag.SEND_TEXT)) {
+				String route = args[0];
+				if (route.equalsIgnoreCase(Tag.SEND_TEXT)) {
 					String username = args[1];
 					String message = args[2];
 					HashMap<String, ChatBox> lsChatBox = context.getListChatBox();
@@ -56,7 +55,7 @@ public class ListenMessage implements Runnable {
 					}
 					chatBox.addMessage(username,message);
 				} 
-				else if (args[0].equalsIgnoreCase(Tag.LIST_ONLINE)) {
+				else if (route.equalsIgnoreCase(Tag.LIST_ONLINE)) {
 					DefaultListModel<String> model = context.getModel();
 					model.clear();
 					for (int i=1;i<args.length;i++) {
@@ -68,48 +67,66 @@ public class ListenMessage implements Runnable {
 						context.getListOnline().notify();
 					}
 				}
-				else if (args[0].equalsIgnoreCase(Tag.FILE_INFO)) {
-					String username = args[1];
-					String length = args[2];
-					int result = JOptionPane.showConfirmDialog(null, String.format("You are receiving %s byte(s) file from %s?",length,username));
+				else if (route.equalsIgnoreCase(Tag.FILE_INFO)) {
+					String from = args[1];
+					String to = args[2];
+					String length = args[3];
+					String fileName = args[4];
+					int result = JOptionPane.showConfirmDialog(null, String.format("Do you want to receive '%s' from '%s'?",fileName,from));
 					if (result==JOptionPane.YES_OPTION) {
-						SocketHandler.getInstance().send(Tag.FILE_RES, UserInformation.getInstance().getUsername(), Tag.ACCEPT, length);
-						
-						DataInputStream dis = new DataInputStream(SocketHandler.getInstance().getSocket().getInputStream());
-						FileOutputStream fos = new FileOutputStream("download.dat");
-						
-						byte[] buffer = new byte[4096];
-						int read = 0;
-						long remain = Long.valueOf(length);
-						
-						while ((read=dis.read(buffer,0,(int) Math.min(remain, buffer.length)))>0){
-							remain -= read;
-							fos.write(buffer);
-						}
-						
-						dis.close();
-						fos.close();
-					
+						SocketHandler.getInstance().send(Tag.FILE_RES, to, from, Tag.ACCEPT, length, fileName);
 					} else {
-						SocketHandler.getInstance().send(Tag.FILE_RES, UserInformation.getInstance().getUsername(), Tag.DENY);
+						SocketHandler.getInstance().send(Tag.FILE_RES, to, from, Tag.DENY, length, fileName);
 					}
 				}
-				else if (args[0].equalsIgnoreCase(Tag.FILE_RES)) {
-					String username = args[1];
-					String res = args[2];
-					if (res.equals(Tag.ACCEPT)) {
+				else if (route.equalsIgnoreCase(Tag.FILE_RES)) {
+					String from = args[1];
+					String to = args[2];
+					String res = args[3];
+					String length = args[4];
+					String fileName = args[5];
+					if (res.equalsIgnoreCase(Tag.ACCEPT)) {
+						SocketHandler.getInstance().send(Tag.SEND_FILE, to, from, length, fileName);
 						
-						File file = context.getListChatBox().get(username).getSelectedFile();
+						File file = context.getListChatBox().get(from).getSelectedFile();
 						FileInputStream fis = new FileInputStream(file);
-						DataOutputStream dos = new DataOutputStream(SocketHandler.getInstance().getSocket().getOutputStream());
+						
+						DataOutputStream dos = SocketHandler.getInstance().getWriter();
 						byte[] buffer = new byte[4096];
 						
 						while (fis.read(buffer)>0) {
 							dos.write(buffer);
 						}
-						dos.close();
+						
 						fis.close();
+					} else {
+						MyDialog dialog = new MyDialog(null,"File transfer",String.format("User %s denied to receive file", from));
+						dialog.setVisible(true);
 					}
+					System.out.println("Done sending file");
+				}
+				else if (route.equalsIgnoreCase(Tag.SEND_FILE)) {
+
+					String from = args[1];
+					String to = args[2];
+					Long length = Long.parseLong(args[3]);
+					String fileName = args[4];
+					
+					FileOutputStream fos = new FileOutputStream(fileName);
+					DataInputStream dis = SocketHandler.getInstance().getReader();
+					
+					byte[] buffer = new byte[4096];
+					int read = 0;
+					long remain = length;
+					
+					System.out.println("Begin to write to file with size: "+length);
+					while ((read=dis.read(buffer,0, (int)Math.min(buffer.length,remain)))>0){
+						remain -= read;
+						fos.write(buffer);
+						System.out.println("Byte remain: "+remain);
+					}
+					fos.close();
+					dis.skip(dis.available());
 				}
 			} while (true);
 		} catch (IOException e) {

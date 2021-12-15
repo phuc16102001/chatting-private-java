@@ -65,7 +65,7 @@ public class ChatBox extends JFrame implements ActionListener {
 			if (returnValue==JFileChooser.APPROVE_OPTION) {
 				selectedFile = fileChooser.getSelectedFile();
 				try {
-					SocketHandler.getInstance().send(Tag.FILE_INFO, UserInformation.getInstance().getUsername(),String.valueOf(selectedFile.getTotalSpace()));
+					SocketHandler.getInstance().send(Tag.FILE_INFO, UserInformation.getInstance().getUsername(), targetName, String.valueOf(selectedFile.length()), selectedFile.getName());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

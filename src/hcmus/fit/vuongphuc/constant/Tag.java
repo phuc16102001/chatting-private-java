@@ -19,6 +19,7 @@ public class Tag {
 	public static String SIGNUP = "signup";
 	public static String LOGIN = "login";
 	public static String SEND_TEXT = "sendText";
+	public static String SEND_FILE = "sendFile";
 	public static String FILE_INFO = "fileInfo";
 	public static String FILE_RES = "fileResponse";
 	public static String LOGOUT = "logout";
