@@ -92,7 +92,7 @@ public class ClientSocket implements Runnable {
 			} else {
 				sendClient(tag,Tag.FAIL);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			sendClient(tag,Tag.FAIL);
 			e.printStackTrace();
 		}

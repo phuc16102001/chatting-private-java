@@ -1,0 +1,1 @@
+MAIN-CLASS: hcmus.fit.vuongphuc.server.Server
