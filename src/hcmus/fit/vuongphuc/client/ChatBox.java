@@ -25,7 +25,7 @@ import java.io.IOException;
  * @author VuongPhuc
  * @see 
  */
-public class ChatBox extends JFrame implements ActionListener {
+public class ChatBox extends JFrame implements ActionListener, WindowListener {
 
 	private String username;
 	private String targetName;
@@ -36,6 +36,7 @@ public class ChatBox extends JFrame implements ActionListener {
 	private JButton btnFile = new JButton(UIManager.getIcon("FileView.fileIcon"));
 	
 	private File selectedFile = null;
+	private OnlineList context = null;
 	
 	public void addMessage(String username, String message) {
 		txtChatBox.append(String.format("%s: %s\n",	username,message));
@@ -96,17 +97,50 @@ public class ChatBox extends JFrame implements ActionListener {
 		return panel;
 	}
 	
-	public ChatBox(String username, String targetName) {
+	public ChatBox(OnlineList context, String username, String targetName) {
+		this.context = context;
 		this.username = username;
 		this.targetName = targetName;
 		
 		JFrame.setDefaultLookAndFeelDecorated(true);
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.setTitle(String.format("Chat box (%s-%s)", this.username, this.targetName));
+		this.addWindowListener(this);
 		
 		this.add(createCenter(),BorderLayout.CENTER);
 		this.add(createBottom(),BorderLayout.SOUTH);
 		
 		this.pack();
 		this.setVisible(true);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		context.removeChatBox(targetName);
+		this.dispose();
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
 	}
 }

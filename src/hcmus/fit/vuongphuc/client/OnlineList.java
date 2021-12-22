@@ -11,6 +11,8 @@ package hcmus.fit.vuongphuc.client;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import java.awt.event.MouseEvent;
+
 import hcmus.fit.vuongphuc.constant.Tag;
 import hcmus.fit.vuongphuc.ui.MyDialog;
 
@@ -27,14 +29,53 @@ import java.awt.*;
  */
 public class OnlineList extends JFrame implements ActionListener {
 
-	private DefaultListModel<String> model = new DefaultListModel<String>();
-	private JList<String> lsOnline = new JList<String>(model);
+	private DefaultListModel<String> model = new DefaultListModel<>();
+	private JList<String> lsOnline = new JList<>(model);
 	private HashMap<String, ChatBox> lsChatBox = new HashMap<>();
 	
 	private Thread threadListen = null;
 	
 	private JButton btnLogout = new JButton("Logout");
 	private JButton btnRefresh = new JButton("Refresh");
+
+	private class DoubleClickAction implements MouseListener {
+		
+		OnlineList context;
+
+		public DoubleClickAction(OnlineList context) {
+			this.context = context;
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			JList<String> list = (JList<String>) e.getSource();
+			if (e.getClickCount()==2) {
+				int index = list.locationToIndex(e.getPoint());
+				if (index!=-1) {
+					String username = lsOnline.getSelectedValue();
+					ChatBox chatBox = new ChatBox(context, UserInformation.getInstance().getUsername(), username);
+					addChatBox(username, chatBox);
+				}
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -84,25 +125,21 @@ public class OnlineList extends JFrame implements ActionListener {
 		panel.add(new JLabel(String.format("Username: %s", UserInformation.getInstance().getUsername())));
 		return panel;
 	}
+
+	public void addChatBox(String username, ChatBox chatBox){
+		lsChatBox.put(username,chatBox);
+	}
+
+	public void removeChatBox(String username) {
+		lsChatBox.remove(username);
+	}
 	
 	private JScrollPane createCenter() {
 		JScrollPane panel = new JScrollPane(lsOnline);
 		
 		panel.setBorder(new TitledBorder("Online user"));
 		
-		lsOnline.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				JList list = (JList) e.getSource();
-				if (e.getClickCount()==2) {
-					int index = list.locationToIndex(e.getPoint());
-					if (index!=-1) {
-						String username = lsOnline.getSelectedValue();
-						lsChatBox.put(username, new ChatBox(UserInformation.getInstance().getUsername(),username));
-					}
-				}
-			}
-		});
+		lsOnline.addMouseListener(new DoubleClickAction(this));
 		lsOnline.setBorder(new EmptyBorder(10,10,10,10));
 		
 		return panel;
@@ -136,7 +173,7 @@ public class OnlineList extends JFrame implements ActionListener {
 		return model;
 	}
 	
-	public JList getListOnline() {
+	public JList<String> getListOnline() {
 		return lsOnline;
 	}
 	
@@ -155,7 +192,6 @@ public class OnlineList extends JFrame implements ActionListener {
 		
 		threadListen = new Thread(new ListenMessage(this));
 		threadListen.start();
-		
 	}
 	
 }

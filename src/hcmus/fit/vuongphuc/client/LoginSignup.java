@@ -130,6 +130,7 @@ public class LoginSignup extends JFrame implements ActionListener {
 	public LoginSignup() {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setTitle("Chat client");
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		this.add(createTop(),BorderLayout.NORTH);
 		this.add(createCenter(),BorderLayout.CENTER);

@@ -49,7 +49,7 @@ public class ListenMessage implements Runnable {
 					HashMap<String, ChatBox> lsChatBox = context.getListChatBox();
 					ChatBox chatBox = lsChatBox.get(username);
 					if (chatBox==null) {
-						chatBox = new ChatBox(UserInformation.getInstance().getUsername(),username);
+						chatBox = new ChatBox(context,UserInformation.getInstance().getUsername(),username);
 						lsChatBox.put(username, chatBox);
 					}
 					chatBox.addMessage(username,message);
