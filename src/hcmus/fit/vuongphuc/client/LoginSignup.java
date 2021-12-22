@@ -28,13 +28,13 @@ public class LoginSignup extends JFrame implements ActionListener {
 	JButton btnLogin = new JButton("Login");
 	JButton btnSignup = new JButton("Sign up");
 	JTextField txtUsername = new JTextField(10);
-	JTextField txtPassword = new JTextField(10);
+	JPasswordField txtPassword = new JPasswordField(10);
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		String username = txtUsername.getText();
-		String password = txtPassword.getText();
+		String password = new String(txtPassword.getPassword());
 
 		if (src==btnLogin) {
 			try {
